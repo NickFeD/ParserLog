@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ParserLog": {
+      "commandName": "Project",
+      "commandLineArgs": "--file-log \"C:\\Users\\sokol\\OneDrive\\Desktop\\log.txt\"\r\n--file-output \"C:\\Users\\sokol\\OneDrive\\Desktop\\log2.txt\"\r\n--time-start 14.05.2024\r\n--time-end 14.06.2036\r\n--address-start 128.135.195.203"
+    },
+    "Профиль 1": {
+      "commandName": "Project",
+      "commandLineArgs": "--file-log \"C:\\Users\\sokol\\OneDrive\\Desktop\\log3.txt\"\r\n--file-output \"C:\\Users\\sokol\\OneDrive\\Desktop\\log2.txt\"\r\n--address-start 128.135.195.203"
+    }
+  }
+}
