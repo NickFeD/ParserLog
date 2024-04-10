@@ -1,5 +1,4 @@
-﻿using Core;
-using System.Net;
+﻿using System.Net;
 
 namespace Core
 {
