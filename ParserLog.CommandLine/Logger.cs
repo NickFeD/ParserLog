@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core;
 
 namespace ParserLog
 {
@@ -10,7 +6,7 @@ namespace ParserLog
     {
         public void Error(string message)
         {
-            Console.WriteLine("Error: "+message);
+            Console.WriteLine("Error: " + message);
         }
 
         public void Info(string message)

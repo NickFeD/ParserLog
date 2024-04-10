@@ -1,8 +1,8 @@
 ﻿
-namespace ParserLog;
+namespace Core;
 
 public interface IFileService
 {
-    IEnumerator<Log> Read(FileInfo file);
-    void Save(FileInfo file, IEnumerator<Log> logs);
+    IEnumerable<Log> Read(FileInfo file);
+    void Save(FileInfo file, IEnumerable<Log> logs);
 }
