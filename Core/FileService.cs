@@ -10,10 +10,10 @@ public class FileService(ILogger logger) : IFileService
 {
     private readonly ILogger _logger = logger;
 
-    public IEnumerator<Log> Read(FileInfo file)
+    public async IAsyncEnumerable<Log> Read(FileInfo file)
     {
 
-        const int bufferSize = 32 * 1024 * 1024; // 32Mb
+        const int bufferSize = 6 * 1024 * 1024; // 32Mb
 
         FileStream fs = new FileStream(file.FullName, FileMode.Open,
             FileAccess.Read, FileShare.Read, bufferSize, true);
@@ -21,9 +21,13 @@ public class FileService(ILogger logger) : IFileService
         using StreamReader streamReader = new StreamReader(fs, Encoding.UTF8, true, bufferSize);
 
         string? stringLog;
+        Task<string?> task = streamReader.ReadLineAsync();
+        Task.WaitAll(task);
 
-        while ((stringLog = streamReader.ReadLine()) != null)
-        { 
+        while ((stringLog = await task) != null)
+        {
+            task = streamReader.ReadLineAsync();
+
             var strings = stringLog.Split(':', 2);
             string datetime = strings[1];
             string ipAddress = strings[0];
@@ -46,17 +50,19 @@ public class FileService(ILogger logger) : IFileService
                 DateTime = date,
                 IpAddress = ipAddress,
             };
+            Task.WaitAll(task);
         }
     }
 
-    public void Save(FileInfo file, IEnumerator<Log> logs)
+    public async void Save(FileInfo file, IAsyncEnumerable<Log> logs)
     {
+        var enumerator = logs.GetAsyncEnumerator();
         Dictionary<string, int> keyValuePairs = new();
         HashSet<string> keys = new HashSet<string>();
         
-        while (logs.MoveNext())
+        while (await enumerator.MoveNextAsync())
         {
-            var ipAddress = logs.Current.IpAddress;
+            var ipAddress = enumerator.Current.IpAddress;
 
             if (!keyValuePairs.ContainsKey(ipAddress))
             {

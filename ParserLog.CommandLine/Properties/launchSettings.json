@@ -2,7 +2,7 @@
   "profiles": {
     "ParserLog.CommandLine": {
       "commandName": "Project",
-      "commandLineArgs": "--file-log \"C:\\Users\\sokol\\OneDrive\\Desktop\\log.txt\"\r\n--file-output \"C:\\Users\\sokol\\OneDrive\\Desktop\\log2.txt\"\r\n--time-start 14.05.2024\r\n--time-end 14.06.3000\r\n--address-start 128.135.195.203\r\n--address-mask 12"
+      "commandLineArgs": "--file-log \"C:\\Users\\sokol\\OneDrive\\Desktop\\log.txt\"\r\n--file-output \"C:\\Users\\sokol\\OneDrive\\Desktop\\log2.txt\"\r\n--time-start 14.05.2020\r\n--time-end 14.06.3000\r\n--address-start 128.135.195.203\r\n--address-mask 12"
     }
   }
 }

@@ -5,7 +5,7 @@ using System.Net;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         ILogger logger = new Logger();
         IFileService fileService = new FileService(logger);
@@ -51,9 +51,9 @@ internal class Program
         },
             fileLogOption, fileOutputOption, timeStartOption, timeEndOption, addressStartOption, addressMaskOption);
 
-        rootCommand.Invoke(args);
+        await rootCommand.InvokeAsync(args);
     }
-    public static IEnumerator<Log> FileLog(FileInfo? file,ILogger logger,IFileService fileService)
+    public static async IAsyncEnumerable<Log> FileLog(FileInfo? file,ILogger logger,IFileService fileService)
     {
         logger.Info("File check");
         if (file is null || !Path.Exists(file.FullName))
@@ -63,50 +63,50 @@ internal class Program
         }
 
         var enumerator = fileService.Read(file);
-        while (enumerator.MoveNext())
+        await foreach (var item in enumerator)
         {
-            yield return enumerator.Current;
+            yield return item;
         }
     }
 
-    public static void FileOutput(FileInfo file, IEnumerator<Log> enumerator,ILogger logger, IFileService fileService)
+    public static void FileOutput(FileInfo file, IAsyncEnumerable<Log> logs,ILogger logger, IFileService fileService)
     {
         logger.Info("File loading check");
-        fileService.Save(file, enumerator);
+        fileService.Save(file, logs);
     }
 
-    public static IEnumerator<Log> TimeStart(DateOnly dateStart,IEnumerator<Log> enumerator)
+    public static async IAsyncEnumerable<Log> TimeStart(DateOnly dateStart, IAsyncEnumerable<Log> logs)
     {
-        while (enumerator.MoveNext())
+        await foreach (Log log in logs)
         {
-            if (enumerator.Current.DateTime > dateStart.ToDateTime(new TimeOnly()))
+            if (log.DateTime > dateStart.ToDateTime(new TimeOnly()))
             {
-                yield return enumerator.Current;
+                yield return log;
             }
         }
     }
 
-    public static IEnumerator<Log> TimeEnd(DateOnly dateEnd, IEnumerator<Log> enumerator,ILogger logger)
+    public static async IAsyncEnumerable<Log> TimeEnd(DateOnly dateEnd, IAsyncEnumerable<Log> logs,ILogger logger)
     {
-        while (enumerator.MoveNext())
+        await foreach (Log log in logs)
         {
-            if (enumerator.Current.DateTime > dateEnd.ToDateTime(new TimeOnly()))
+            if (log.DateTime > dateEnd.ToDateTime(new TimeOnly()))
             {
-                logger.Info($"the contents of the file from the date {enumerator.Current.DateTime} is not being viewed");
+                logger.Info($"the contents of the file from the date {log.DateTime} is not being viewed");
                 yield break;
             }
 
-            yield return enumerator.Current;
+            yield return log;
         }
     }
 
-    public static IEnumerator<Log> AddressStart(IPAddress addressStart, IEnumerator<Log> enumerator,ILogger logger)
+    public static async IAsyncEnumerable<Log> AddressStart(IPAddress addressStart, IAsyncEnumerable<Log> logs,ILogger logger)
     {
-        while (enumerator.MoveNext())
+        await foreach (Log log in logs)
         {
-            if (!IPAddress.TryParse(enumerator.Current.IpAddress, out var enumeratorIPAddress))
+            if (!IPAddress.TryParse(log.IpAddress, out var enumeratorIPAddress))
             {
-                logger.Error($"{enumerator.Current.IpAddress} no IP address");
+                logger.Error($"{log.IpAddress} no IP address");
                 yield break;
             }
 
@@ -115,19 +115,19 @@ internal class Program
                 continue;
             }
 
-            yield return enumerator.Current;
+            yield return log;
         }
     }
 
-    public static IEnumerator<Log> AddressMask(IPAddress iPAddressStart, int addressMask, IEnumerator<Log> enumerator)
+    public static async IAsyncEnumerable<Log> AddressMask(IPAddress iPAddressStart, int addressMask, IAsyncEnumerable<Log> logs)
     {
         string binaryAddressStart = ToBinary(iPAddressStart);
-        while (enumerator.MoveNext())
+        await foreach (Log log in logs)
         {
-            string binaryIpAddress = ToBinary(IPAddress.Parse(enumerator.Current.IpAddress));
+            string binaryIpAddress = ToBinary(IPAddress.Parse(log.IpAddress));
             if (binaryIpAddress.Substring(0, addressMask) == binaryAddressStart.Substring(0, addressMask))
             {
-                yield return enumerator.Current;
+                yield return log;
             }
         }
     }
