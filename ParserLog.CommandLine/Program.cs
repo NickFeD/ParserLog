@@ -1,6 +1,9 @@
 ﻿using Core;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ParserLog;
 using ParserLog.CommandLine;
+using ParserLog.CommandLine.Services;
 using System.CommandLine;
 using System.Net;
 
@@ -8,9 +11,17 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        ILogger logger = new Logger();
-        IFileService fileService = new FileService(logger);
-        ILogProcessor logProcessor = new LogProcessor(logger, fileService);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+        builder.Services.AddTransient<ILogger, Logger>();
+        builder.Services.AddSingleton<IFileService, FileService>();
+        builder.Services.AddSingleton<ILogProcessor, LogProcessor>();
+
+        using IHost host = builder.Build();
+
+        host.Run();
+
+        ILogProcessor logProcessor = host.Services.GetRequiredService<ILogProcessor>();
 
         var rootCommand = GetRootCommand(logProcessor);
 

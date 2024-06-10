@@ -11,7 +11,6 @@ public class FileService(ILogger logger) : IFileService
 
     public IEnumerable<Log> Read(FileInfo file)
     {
-
         const int bufferSize = 16 * 1024 * 1024; // 32Mb
 
         FileStream fs = new FileStream(file.FullName, FileMode.Open,

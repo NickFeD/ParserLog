@@ -29,26 +29,26 @@ public class LogProcessor : ILogProcessor
         return enumerator;
     }
 
-    public IEnumerable<Log> FileLog(FileInfo file)
+    public ParallelQuery<Log> FileLog(FileInfo file)
     {
         _logger.Info("File check");
 
-        return _fileService.Read(file);
+        return _fileService.Read(file).AsParallel();
     }
 
-    public void FileOutput(FileInfo file, IEnumerable<Log> enumerator)
+    public void FileOutput(FileInfo file, ParallelQuery<Log> enumerator)
     {
         _logger.Info("File loading check");
         _fileService.Save(file, enumerator);
     }
 
-    public IEnumerable<Log> TimeStart(DateOnly dateStart, IEnumerable<Log> logs)
+    public ParallelQuery<Log> TimeStart(DateOnly dateStart, ParallelQuery<Log> logs)
         => logs.Where(l => l.DateTime.Date >= dateStart.ToDateTime(new TimeOnly()));
 
-    public IEnumerable<Log> TimeEnd(DateOnly dateEnd, IEnumerable<Log> logs)
+    public ParallelQuery<Log> TimeEnd(DateOnly dateEnd, ParallelQuery<Log> logs)
         => logs.Where(l => l.DateTime < dateEnd.ToDateTime(new TimeOnly()));
 
-    public IEnumerable<Log> AddressFilter(IPAddress addressStart, int? addressMask, IEnumerable<Log> logs)
+    public ParallelQuery<Log> AddressFilter(IPAddress addressStart, int? addressMask, ParallelQuery<Log> logs)
     {
 
         if (addressMask is not null)
